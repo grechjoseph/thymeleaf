@@ -3,20 +3,21 @@ package com.jg.thymeleaf.controller;
 import com.jg.thymeleaf.model.Client;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 public class ThymeleafController {
 
-    Map<Integer, Client> clientMap = Map.of(
-            1, Client.builder().name("Joseph").surname("Grech").age(29).build(),
-            2, Client.builder().name("Nathalie").surname("Grima").age(31).build(),
-            3, Client.builder().name("Joseph").surname("Grima").age(30).build()
-    );
+    Map<Integer, Client> clientMap = new HashMap<>() {
+        {
+            put(1, new Client("Joseph", "Grech", 29));
+            put(2, new Client("Nathalie", "Grima", 31));
+            put(3, new Client("Joseph", "Grima", 30));
+        }
+    };
 
     /**
      * The method has to return the name of the View to use. It is also responsible for populating the model's attributes.
@@ -53,10 +54,14 @@ public class ThymeleafController {
         for(Map.Entry<Integer, Client> e : clientMap.entrySet()){
             int id = e.getKey();
             String name = e.getValue().getName();
-            links += "<a href='clients/" + id + "'>" + name + "</a><br/>";
+            String surname = e.getValue().getSurname();
+            links += "<a href='clients/" + id + "'>" + name + " " + surname + "</a><br/>";
         }
 
+        // Add attribute of links' HTML to generate
         model.addAttribute("links", links);
+        // Add attribute of new instance of Client for POSTing
+        model.addAttribute("client", new Client());
         return "subdirectory/clients";
     }
 
@@ -67,5 +72,11 @@ public class ThymeleafController {
         model.addAttribute("surname", client.getSurname());
         model.addAttribute("age", client.getAge());
         return "/subdirectory/client";
+    }
+
+    @PostMapping("/clients")
+    public String addClient(@ModelAttribute(value="client") Client client, Model model) {
+        clientMap.put(clientMap.size() + 1, client);
+        return getClients(model);
     }
 }

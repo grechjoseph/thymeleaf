@@ -5,8 +5,20 @@
     <title>Title</title>
 </head>
 <body>
-    <p>Select a client from the list below:</p>
+
+    <h2>Clients:</h2>
     <div th:utext="${links}"></div>
+
+    <h2>Add a new Client:</h2>
+    <form action="#" th:action="@{/clients}" th:object="${client}" method="post">
+        <input type="text" th:field="*{name}" placeholder="Name" />
+        <br/>
+        <input type="text" th:field="*{surname}" placeholder="Surname" />
+        <br/>
+        <input type="text" th:field="*{age}" placeholder="Age" />
+        <br/>
+        <input type="submit" /> <input type="reset" />
+    </form>
 </body>
 <div th:replace="fragments/footer :: footer"></div>
 </html>
